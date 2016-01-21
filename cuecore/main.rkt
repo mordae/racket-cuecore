@@ -71,16 +71,25 @@
 
     (: request (-> String Any * JSExpr))
     (define/private (request fmt . args)
+      (define final-url
+        (apply format fmt args))
+
+      (log-cuecore-debug "-> ~a" final-url)
+
       (define in-port : Input-Port
         (get-pure-port
           (string->url
-            (let ((path (apply format fmt args)))
+            (let ((path final-url))
               (format "http://~a~a" host path)))))
 
       (begin0
         (if (regexp-match-peek #"^{" in-port)
             (let ((js (read-json in-port)))
-              (if (eof-object? js) 'null js))
+              (if (eof-object? js)
+                  'null
+                  (begin
+                    (log-cuecore-debug "-> ~s" js)
+                    (values js))))
             (values 'null))
         (close-input-port in-port)))
 
