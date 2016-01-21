@@ -95,12 +95,10 @@
 
     (define/public (set-channel! channel value)
       (void
-        (request "/ajax/monitor/input/unit-decimal")
+        (request "/ajax/console/input/unit-decimal")
         (request "/ajax/console/input/command/~a@~a" channel value)))
 
     (define/public (get-status group)
-      (request "/ajax/monitor/input/unit-decimal")
-
       (if (< group 8)
           (request "/ajax/monitor/input/source-dmx-outa")
           (request "/ajax/monitor/input/source-dmx-outb"))
@@ -111,6 +109,8 @@
            (unless (= page (modulo group 8))
              (request "/ajax/monitor/input/page-down")
              (loop)))))
+
+      (request "/ajax/monitor/input/unit-decimal")
 
       (match (request "/ajax/monitor/channels")
         ((hash-lookup ('channels (hash-lookup ('data (? list? data)))))
